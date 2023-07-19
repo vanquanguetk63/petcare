@@ -1,6 +1,8 @@
 package com.petcare.be.service;
 
 import com.petcare.be.model.User;
+import com.petcare.be.security.dto.RegisterRequest;
+import com.petcare.be.security.dto.RegisterResponse;
 
 /**
  * Created on Ağustos, 2020
@@ -8,8 +10,7 @@ import com.petcare.be.model.User;
  * @author Faruk
  */
 public interface UserService {
-
-	User findByUsername(String username);
+	RegisterResponse registration(RegisterRequest registrationRequest);
 
 //	RegistrationResponse registration(RegistrationRequest registrationRequest);
 //

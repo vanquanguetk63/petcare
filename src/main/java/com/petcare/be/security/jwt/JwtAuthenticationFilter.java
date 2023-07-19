@@ -1,7 +1,7 @@
 package com.petcare.be.security.jwt;
 
-import com.farukgenc.boilerplate.springboot.security.service.UserDetailsServiceImpl;
-import com.farukgenc.boilerplate.springboot.security.utils.SecurityConstants;
+import com.petcare.be.service.UserDetailsServiceImpl;
+import com.petcare.be.util.SecurityConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				log.error("Authentication Exception : {}", e.getMessage());
 			}
 		}
-
+		log.info("username",username);
 		final SecurityContext securityContext = SecurityContextHolder.getContext();
 
 		if (Objects.nonNull(username) && Objects.isNull(securityContext.getAuthentication())) {
