@@ -2,6 +2,7 @@ package com.petcare.be.controller;
 
 import com.petcare.be.model.User;
 import com.petcare.be.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class UserController {
     @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/api/users")
     public List<User> getUsers() {
-
         return userRepository.findAll();
     }
 }

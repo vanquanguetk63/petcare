@@ -1,8 +1,15 @@
 package com.petcare.be.model;
 
+import lombok.*;
+
 import javax.persistence.*;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class User {
 
@@ -13,6 +20,5 @@ public class User {
     @Column(unique = true)
     private String username;
     private String email;
-
-
+    private String password;
 }
