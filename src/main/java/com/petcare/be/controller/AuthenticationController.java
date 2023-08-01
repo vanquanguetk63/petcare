@@ -34,4 +34,11 @@ public class AuthenticationController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationResponse);
     }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<RegisterResponse> validateToken(@Valid @RequestBody RegisterRequest registerRequest) {
+        final RegisterResponse registrationResponse = userService.registration(registerRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(registrationResponse);
+    }
 }

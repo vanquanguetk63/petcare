@@ -7,11 +7,6 @@ import lombok.Setter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
-/**
- * Created on Ağustos, 2020
- *
- * @author Faruk
- */
 @Getter
 @Setter
 @NoArgsConstructor

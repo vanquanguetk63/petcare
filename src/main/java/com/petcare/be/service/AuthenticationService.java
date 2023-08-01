@@ -38,13 +38,34 @@ public class AuthenticationService implements UserService {
     }
 
     private User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        try {
+            return userRepository.findByUsername(username);
+        } catch (Exception exception) {
+            throw new Error("Not found user");
+        }
+    }
+
+    private User findByUsername(String username, String password) {
+        try {
+            return userRepository.findByUsername(username);
+        } catch (Exception exception) {
+            throw new Error("Not found user");
+        }
     }
 
     public AuthenticatedUserDto findAuthenticatedUserByUsername(String username) {
 
         final User user = this.findByUsername(username);
-
         return UserMapper.INSTANCE.convertToAuthenticatedUserDto(user);
+    }
+
+    public AuthenticatedUserDto findAuthenticatedUserByUsernameAndPassword(String username, String password) {
+
+        final User user = this.findByUsername(username);
+        return UserMapper.INSTANCE.convertToAuthenticatedUserDto(user);
+    }
+
+    public User getInformationUser(String username) {
+        return this.findByUsername(username);
     }
 }

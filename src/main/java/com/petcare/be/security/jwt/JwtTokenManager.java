@@ -20,59 +20,68 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenManager {
 
-	private final JwtProperties jwtProperties;
+    private final JwtProperties jwtProperties;
 
-	public String generateToken(User user) {
+    public String generateToken(User user) {
 
-		final String username = user.getUsername();
+        final String username = user.getUsername();
 //		final UserRole userRole = user .getUserRole();
 
-		//@formatter:off
-		return JWT.create()
-				.withSubject(username)
-				.withIssuer(jwtProperties.getIssuer())
+        return JWT.create()
+                .withSubject(username)
+                .withIssuer(jwtProperties.getIssuer())
 //				.withClaim("role", userRole.name())
-				.withIssuedAt(new Date())
-				.withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getExpirationMinute() * 60 * 1000))
-				.sign(Algorithm.HMAC256(jwtProperties.getSecretKey().getBytes()));
-		//@formatter:on
-	}
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getExpirationMinute() * 60 * 1000))
+                .sign(Algorithm.HMAC256(jwtProperties.getSecretKey().getBytes()));
+    }
 
-	public String getUsernameFromToken(String token) {
+    public String generateAccessToken(User user) {
+        final String username = user.getUsername();
 
-		final DecodedJWT decodedJWT = getDecodedJWT(token);
+        return JWT.create()
+                .withSubject(username)
+                .withIssuer(jwtProperties.getIssuer())
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis()))
+                .sign(Algorithm.HMAC256(jwtProperties.getSecretKey().getBytes()));
+    }
 
-		return decodedJWT.getSubject();
-	}
+    public String getUsernameFromToken(String token) {
 
-	public boolean validateToken(String token, String authenticatedUsername) {
+        final DecodedJWT decodedJWT = getDecodedJWT(token);
 
-		final String usernameFromToken = getUsernameFromToken(token);
+        return decodedJWT.getSubject();
+    }
 
-		final boolean equalsUsername = usernameFromToken.equals(authenticatedUsername);
-		final boolean tokenExpired = isTokenExpired(token);
+    public boolean validateToken(String token, String authenticatedUsername) {
 
-		return equalsUsername && !tokenExpired;
-	}
+        final String usernameFromToken = getUsernameFromToken(token);
 
-	private boolean isTokenExpired(String token) {
+        final boolean equalsUsername = usernameFromToken.equals(authenticatedUsername);
+        final boolean tokenExpired = isTokenExpired(token);
 
-		final Date expirationDateFromToken = getExpirationDateFromToken(token);
-		return expirationDateFromToken.before(new Date());
-	}
+        return equalsUsername && !tokenExpired;
+    }
 
-	private Date getExpirationDateFromToken(String token) {
+    private boolean isTokenExpired(String token) {
 
-		final DecodedJWT decodedJWT = getDecodedJWT(token);
+        final Date expirationDateFromToken = getExpirationDateFromToken(token);
+        return expirationDateFromToken.before(new Date());
+    }
 
-		return decodedJWT.getExpiresAt();
-	}
+    private Date getExpirationDateFromToken(String token) {
 
-	private DecodedJWT getDecodedJWT(String token) {
+        final DecodedJWT decodedJWT = getDecodedJWT(token);
 
-		final JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(jwtProperties.getSecretKey().getBytes())).build();
+        return decodedJWT.getExpiresAt();
+    }
 
-		return jwtVerifier.verify(token);
-	}
+    private DecodedJWT getDecodedJWT(String token) {
+
+        final JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(jwtProperties.getSecretKey().getBytes())).build();
+
+        return jwtVerifier.verify(token);
+    }
 
 }

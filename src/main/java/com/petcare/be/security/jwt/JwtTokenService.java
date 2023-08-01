@@ -5,6 +5,7 @@ import com.petcare.be.model.User;
 import com.petcare.be.security.dto.AuthenticatedUserDto;
 import com.petcare.be.security.dto.LoginRequest;
 import com.petcare.be.security.dto.LoginResponse;
+import com.petcare.be.security.dto.UserInformationDto;
 import com.petcare.be.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,39 +13,32 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-/**
- * Created on Ağustos, 2020
- *
- * @author Faruk
- */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class JwtTokenService {
 
-	private final AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
-	private final JwtTokenManager jwtTokenManager;
+    private final JwtTokenManager jwtTokenManager;
 
-	private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-	public LoginResponse getLoginResponse(LoginRequest loginRequest) {
+    public LoginResponse getLoginResponse(LoginRequest loginRequest) {
 
-		final String username = loginRequest.getUsername();
-		final String password = loginRequest.getPassword();
+        final String username = loginRequest.getUsername();
+        final String password = loginRequest.getPassword();
 
-		final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        final UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
 
-		authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        final User user = authenticationService.getInformationUser(username);
+        final String token = jwtTokenManager.generateToken(user);
+        final String accessToken = jwtTokenManager.generateAccessToken(user);
+        final UserInformationDto userInformationDto = new UserInformationDto(user.getUsername(), user.getEmail());
 
-		final AuthenticatedUserDto authenticatedUserDto = authenticationService.findAuthenticatedUserByUsername(username);
-
-		final User user = UserMapper.INSTANCE.convertToUser(authenticatedUserDto);
-		final String token = jwtTokenManager.generateToken(user);
-
-		log.info("{} has successfully logged in!", user.getUsername());
-
-		return new LoginResponse(token);
-	}
+        return new LoginResponse(token, accessToken, userInformationDto);
+    }
 
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 public class AuthenticatedUserDto {
 
 	private String name;
-
+	private String email;
 	private String username;
 
 	private String password;
