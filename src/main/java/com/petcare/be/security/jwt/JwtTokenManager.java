@@ -5,23 +5,22 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.petcare.be.model.User;
+import com.petcare.be.security.dto.UserInformationDto;
+import com.petcare.be.security.dto.ValidateTokenRequestDto;
+import com.petcare.be.security.dto.ValidateTokenResponseDto;
+import com.petcare.be.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-
-/**
- * Created on Ağustos, 2020
- *
- * @author Faruk
- */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenManager {
 
     private final JwtProperties jwtProperties;
-
     public String generateToken(User user) {
 
         final String username = user.getUsername();
@@ -43,8 +42,19 @@ public class JwtTokenManager {
                 .withSubject(username)
                 .withIssuer(jwtProperties.getIssuer())
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getExpirationAccessTokenMinute() * 60 * 1000))
                 .sign(Algorithm.HMAC256(jwtProperties.getSecretKey().getBytes()));
+    }
+
+    public ValidateTokenResponseDto refreshToken(String accessToken, User user) {
+        final boolean validateAccessToken = isTokenExpired(accessToken);
+        if (validateAccessToken) {
+            final String token = generateToken(user);
+            final String newAccesToken = generateAccessToken(user);
+            return new ValidateTokenResponseDto(token,newAccesToken,new UserInformationDto(user.getUsername(), user.getEmail()));
+        } else {
+            throw new Error("Expired Token");
+        }
     }
 
     public String getUsernameFromToken(String token) {
@@ -63,11 +73,11 @@ public class JwtTokenManager {
 
         return equalsUsername && !tokenExpired;
     }
-
     private boolean isTokenExpired(String token) {
 
         final Date expirationDateFromToken = getExpirationDateFromToken(token);
-        return expirationDateFromToken.before(new Date());
+        final Date currentDate = new Date();
+        return currentDate.before(expirationDateFromToken);
     }
 
     private Date getExpirationDateFromToken(String token) {
@@ -75,6 +85,13 @@ public class JwtTokenManager {
         final DecodedJWT decodedJWT = getDecodedJWT(token);
 
         return decodedJWT.getExpiresAt();
+    }
+
+    private String getSubject(String token) {
+
+        final DecodedJWT decodedJWT = getDecodedJWT(token);
+
+        return decodedJWT.getSubject();
     }
 
     private DecodedJWT getDecodedJWT(String token) {

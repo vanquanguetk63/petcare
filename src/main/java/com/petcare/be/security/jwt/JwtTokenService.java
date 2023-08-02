@@ -1,11 +1,7 @@
 package com.petcare.be.security.jwt;
 
-import com.petcare.be.mapper.UserMapper;
 import com.petcare.be.model.User;
-import com.petcare.be.security.dto.AuthenticatedUserDto;
-import com.petcare.be.security.dto.LoginRequest;
-import com.petcare.be.security.dto.LoginResponse;
-import com.petcare.be.security.dto.UserInformationDto;
+import com.petcare.be.security.dto.*;
 import com.petcare.be.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +35,12 @@ public class JwtTokenService {
         final UserInformationDto userInformationDto = new UserInformationDto(user.getUsername(), user.getEmail());
 
         return new LoginResponse(token, accessToken, userInformationDto);
+    }
+
+    public ValidateTokenResponseDto getValidateToken(ValidateTokenRequestDto validateTokenDto) {
+        final String username = validateTokenDto.getUsername();
+        final User user = authenticationService.getInformationUser(username);
+        return jwtTokenManager.refreshToken(validateTokenDto.getAccessToken(), user);
     }
 
 }

@@ -57,7 +57,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				log.error("Authentication Exception : {}", e.getMessage());
 			}
 		}
-		log.info("username",username);
 		final SecurityContext securityContext = SecurityContextHolder.getContext();
 
 		if (Objects.nonNull(username) && Objects.isNull(securityContext.getAuthentication())) {

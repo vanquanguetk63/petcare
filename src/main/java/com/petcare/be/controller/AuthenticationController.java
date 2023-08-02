@@ -1,21 +1,22 @@
 package com.petcare.be.controller;
 
 
-import com.petcare.be.security.dto.LoginRequest;
-import com.petcare.be.security.dto.LoginResponse;
-import com.petcare.be.security.dto.RegisterRequest;
-import com.petcare.be.security.dto.RegisterResponse;
+import com.petcare.be.security.dto.*;
 import com.petcare.be.security.jwt.JwtTokenService;
 import com.petcare.be.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Slf4j
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 public class AuthenticationController {
@@ -35,10 +36,11 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationResponse);
     }
 
-    @PostMapping("/validate-token")
-    public ResponseEntity<RegisterResponse> validateToken(@Valid @RequestBody RegisterRequest registerRequest) {
-        final RegisterResponse registrationResponse = userService.registration(registerRequest);
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ValidateTokenResponseDto> validateToken(@Valid @RequestBody ValidateTokenRequestDto validateTokenRequestDto) {
+        log.debug("validateTokenRequestDto", validateTokenRequestDto.getToken());
+        final ValidateTokenResponseDto validateTokenResponseDto = jwtTokenService.getValidateToken(validateTokenRequestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(registrationResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(validateTokenResponseDto);
     }
 }
